@@ -42,3 +42,13 @@ Dependency Injection is a design pattern where Spring automatically creates and 
 | dto | Transfers data between layers without exposing entities |
 | config | Stores configuration classes for the application |
 | exception | Handles errors and custom exceptions globally |
+
+## Endpoints
+
+| Method | URL                       | Body         |
+|--------|---------------------------|--------------|
+| POST   | /api/categories           | { "name" }   |
+| GET    | /api/categories           | -            |
+| GET    | /api/categories/{id}      | -            |
+| PUT    | /api/categories/{id}      | { "name" }   |
+| DELETE | /api/categories/{id}      | -            |
