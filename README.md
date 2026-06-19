@@ -52,3 +52,16 @@ Dependency Injection is a design pattern where Spring automatically creates and 
 | GET    | /api/categories/{id}      | -            |
 | PUT    | /api/categories/{id}      | { "name" }   |
 | DELETE | /api/categories/{id}      | -            |
+
+## API Response Format
+
+Every endpoint returns the same JSON structure:
+
+```json
+{
+  "statusCode": 200,
+  "message": "Category retrieved",
+  "data": { "id": 1, "name": "Fast Food" },
+  "timestamp": "2026-06-18T08:42:11"
+}
+``
