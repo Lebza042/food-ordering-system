@@ -1,0 +1,67 @@
+package food_ordering_system;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+// Service implementation containing menu business logic
+@Service
+public class MenuServiceImpl implements MenuService {
+
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Override
+    public Response<MenuDto> createMenu(MenuDto dto) {
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Category not found with id: " + dto.getCategoryId()));
+        Menu menu = mapToEntity(dto, category);
+        Menu saved = menuRepository.save(menu);
+        return Response.success("Menu created", mapToDto(saved));
+    }
+
+    @Override
+    public Response<List<MenuDto>> getAllMenus() {
+        List<MenuDto> menus = menuRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+        return Response.success("Menus retrieved", menus);
+    }
+
+    @Override
+    public Response<MenuDto> getMenuById(Long id) {
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Menu not found with id: " + id));
+        return Response.success("Menu retrieved", mapToDto(menu));
+    }
+
+    // Convert Menu entity to MenuDto
+    private MenuDto mapToDto(Menu menu) {
+        MenuDto dto = new MenuDto();
+        dto.setId(menu.getId());
+        dto.setName(menu.getName());
+        dto.setDescription(menu.getDescription());
+        dto.setPrice(menu.getPrice());
+        dto.setImageUrl(menu.getImageUrl());
+        dto.setCategoryId(menu.getCategory().getId());
+        dto.setCategoryName(menu.getCategory().getName());
+        return dto;
+    }
+
+    // Convert MenuDto to Menu entity
+    private Menu mapToEntity(MenuDto dto, Category category) {
+        Menu menu = new Menu();
+        menu.setName(dto.getName());
+        menu.setDescription(dto.getDescription());
+        menu.setPrice(dto.getPrice());
+        menu.setImageUrl(dto.getImageUrl());
+        menu.setCategory(category);
+        return menu;
+    }
+}
