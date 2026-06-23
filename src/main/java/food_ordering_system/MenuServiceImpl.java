@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-// Service implementation containing menu business logic
 @Service
 public class MenuServiceImpl implements MenuService {
 
@@ -36,12 +35,37 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Response<MenuDto> getMenuById(Long id) {
         Menu menu = menuRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(
+                .orElseThrow(() -> new MenuNotFoundException(
                         "Menu not found with id: " + id));
         return Response.success("Menu retrieved", mapToDto(menu));
     }
 
-    // Convert Menu entity to MenuDto
+    @Override
+    public Response<MenuDto> updateMenu(Long id, MenuDto dto) {
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new MenuNotFoundException(
+                        "Menu not found with id: " + id));
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Category not found with id: " + dto.getCategoryId()));
+        menu.setName(dto.getName());
+        menu.setDescription(dto.getDescription());
+        menu.setPrice(dto.getPrice());
+        menu.setImageUrl(dto.getImageUrl());
+        menu.setCategory(category);
+        Menu updated = menuRepository.save(menu);
+        return Response.success("Menu updated", mapToDto(updated));
+    }
+
+    @Override
+    public Response<Void> deleteMenu(Long id) {
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new MenuNotFoundException(
+                        "Menu not found with id: " + id));
+        menuRepository.delete(menu);
+        return Response.success("Menu deleted", null);
+    }
+
     private MenuDto mapToDto(Menu menu) {
         MenuDto dto = new MenuDto();
         dto.setId(menu.getId());
@@ -54,7 +78,6 @@ public class MenuServiceImpl implements MenuService {
         return dto;
     }
 
-    // Convert MenuDto to Menu entity
     private Menu mapToEntity(MenuDto dto, Category category) {
         Menu menu = new Menu();
         menu.setName(dto.getName());
