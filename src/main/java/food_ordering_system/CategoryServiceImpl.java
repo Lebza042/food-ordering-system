@@ -10,6 +10,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private MenuRepository menuRepository;
 
     @Override
     public List<CategoryDto> getAllCategories() {
@@ -56,11 +58,16 @@ public class CategoryServiceImpl implements CategoryService {
         result.setName(updated.getName());
         return result;
     }
-
     @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
+
+        boolean hasMenus = menuRepository.existsByCategoryId(id);
+        if (hasMenus) {
+            throw new CategoryInUseException("Cannot delete category with id: " + id + " because it still has menu items");
+        }
+
         categoryRepository.delete(category);
     }
 }

@@ -1,11 +1,10 @@
 package food_ordering_system;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
-// Service interface defining menu business logic contract
 public interface MenuService {
     Response<MenuDto> createMenu(MenuDto dto);
-    Response<List<MenuDto>> getAllMenus();
+    Page<MenuDto> getAllMenus(Long categoryId, String search, int page, int size, String sort);
     Response<MenuDto> getMenuById(Long id);
     Response<MenuDto> updateMenu(Long id, MenuDto dto);
     Response<Void> deleteMenu(Long id);

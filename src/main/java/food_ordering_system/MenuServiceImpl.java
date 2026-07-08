@@ -1,8 +1,8 @@
 package food_ordering_system;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -24,12 +24,18 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Response<List<MenuDto>> getAllMenus() {
-        List<MenuDto> menus = menuRepository.findAll()
-                .stream()
-                .map(this::mapToDto)
-                .toList();
-        return Response.success("Menus retrieved", menus);
+    public Page<MenuDto> getAllMenus(Long categoryId, String search, int page, int size, String sort) {
+        Sort sortObj = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            String[] parts = sort.split(",");
+            String field = parts[0];
+            Sort.Direction direction = parts.length > 1 && parts[1].equalsIgnoreCase("desc")
+                    ? Sort.Direction.DESC : Sort.Direction.ASC;
+            sortObj = Sort.by(direction, field);
+        }
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+        return menuRepository.findByFilters(categoryId, search, pageable)
+                .map(this::mapToDto);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package food_ordering_system;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import java.util.List;
 
 // Controller handling HTTP requests for menu endpoints
 @RestController
@@ -20,8 +20,13 @@ public class MenuController {
     }
 
     @GetMapping
-    public ResponseEntity<Response<List<MenuDto>>> all() {
-        return ResponseEntity.ok(menuService.getAllMenus());
+    public ResponseEntity<Page<MenuDto>> all(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        return ResponseEntity.ok(menuService.getAllMenus(categoryId, search, page, size, sort));
     }
 
     @GetMapping("/{id}")
