@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 public class AuthDto {
 
@@ -39,5 +40,29 @@ public class AuthDto {
     @Builder
     public static class RegisterResponse {
         private String message;
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class LoginRequest {
+
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email must be valid")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        private String password;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class LoginResponse {
+        private String token;
+        private String email;
+        private String name;
+        private List<String> roles;
     }
 }
