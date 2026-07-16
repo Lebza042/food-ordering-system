@@ -58,8 +58,10 @@ public class JwtUtils {
                     .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
+            System.out.println("JWT EXPIRED: " + e.getMessage());
             return false;
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("JWT INVALID: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return false;
         }
     }

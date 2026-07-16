@@ -68,9 +68,4 @@ public class GlobalExceptionHandler {
                 .body(Response.error(HttpStatus.FORBIDDEN.value(), "You do not have permission to perform this action"));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Response<Void>> handleGeneric(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Response.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred"));
-    }
 }

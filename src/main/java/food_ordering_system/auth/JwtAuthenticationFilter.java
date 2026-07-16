@@ -34,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = extractToken(request);
+        System.out.println("RAW AUTH HEADER: " + request.getHeader("Authorization"));
+        System.out.println("EXTRACTED TOKEN: " + token);
 
         if (token != null && jwtUtils.isTokenValid(token)) {
             String email = jwtUtils.extractEmail(token);

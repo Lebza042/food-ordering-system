@@ -64,4 +64,46 @@ Every endpoint returns the same JSON structure:
   "data": { "id": 1, "name": "Fast Food" },
   "timestamp": "2026-06-18T08:42:11"
 }
-``
+
+## Auth Endpoints
+
+| Method | Path                  | Who Can Call It      |
+|--------|-----------------------|-----------------------|
+| POST   | /api/auth/register    | Public (anyone)       |
+| POST   | /api/auth/login       | Public (anyone)       |
+| GET    | /api/categories/**    | Public (anyone)       |
+| GET    | /api/menu/**          | Public (anyone)       |
+| GET    | /api/reviews/**       | Public (anyone)       |
+| POST   | /api/categories/**    | ADMIN only            |
+| PUT    | /api/categories/**    | ADMIN only            |
+| DELETE | /api/categories/**    | ADMIN only            |
+| POST   | /api/menu/**          | ADMIN only            |
+| PUT    | /api/menu/**          | ADMIN only            |
+| DELETE | /api/menu/**          | ADMIN only            |
+| *      | Everything else       | Any authenticated user |
+
+## Security Rules Summary
+
+- **Public** — no token required: register, login, and all read (GET) operations on categories, menu, and reviews.
+- **Customer** (any authenticated user) — can access their own profile, cart, and orders (upcoming). Cannot create, update, or delete categories or menu items.
+- **Admin** — full write access to categories and menu items (create, update, delete), in addition to all customer-level permissions.
+
+Unauthenticated requests to protected endpoints return `401 Unauthorized`. Authenticated requests without the required role return `403 Forbidden`. Both use the app's standard `Response<T>` error shape.
+
+## Promoting a User to ADMIN
+
+New users are always registered with the `CUSTOMER` role by default — there is no way for a client to self-assign `ADMIN`. To promote an existing user to `ADMIN`, run the following SQL directly in MySQL Workbench:
+
+\`\`\`sql
+UPDATE users_roles
+SET role_id = (SELECT id FROM roles WHERE name = 'ADMIN')
+WHERE user_id = (SELECT id FROM users WHERE email = 'the.users.email@example.com');
+\`\`\`
+
+Replace the email with the user you want to promote. Roles are always looked up by name, never hardcoded by ID, so this works regardless of environment.
+
+## How to Authenticate in Postman
+
+1. Send a `POST /api/auth/login` request with a valid email and password. On success, a post-response script automatically saves the returned token into the `adminToken` or `customerToken` environment variable (based on the user's role), and always also into `authToken`.
+2. Set the collection-level Authorization to **Bearer Token** with the value `{{authToken}}` (or reference `{{adminToken}}` / `{{customerToken}}` directly on individual requests when you need to test role-specific behavior).
+3. Individual requests inherit the token automatically — no need to copy-paste it manually. To test an endpoint without auth, override that request's Authorization tab to **No Auth**.
